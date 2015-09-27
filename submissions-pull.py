@@ -8,11 +8,11 @@
 ##
 ##
 
-import sys
-import os
-import time
-from shutil import rmtree
-from datetime import datetime
+import sys                    # For command line arguments.
+import os                     # For file and folder manipulation.
+import time                   # For displaying timestamps.
+from shutil import rmtree     # For deleting a folder.
+from datetime import datetime # For making timestamps.
 
 #####################################################################
 ## ASCII escape sequence macros for color output on the terminal.
@@ -68,16 +68,6 @@ for student in enrolled:
     if not student in gsubmits:
         printred('No gsubmit subfolder for '+student+' found!')
     elif not os.path.isfile(os.path.join(path, student)):
-        
-        #submittedPaths = ['hw1/a1.py', 'a1.py', 'Assignment1/a1.py', 'PS1/a1.py', 'a1/a1.py', 'HW1/a1.py','hw01/a1.py', 'HW01/a1.py','CS320_Assignment_1/a1.py']
-        #submittedPaths = ['final/Parse.hs', 'final/TypeCheck.hs','final/Interpret.hs','final/Optimize.hs','final/Compile.hs']
-        #submittedPaths = ['midterm/parse.py', 'midterm/interpret.py', 'midterm/compile.py', 'midterm/analyze.py', 'midterm/validate.py']
-        #submittedPaths = ['project/AbstractSyntax.hs', 'project/Parse.hs', 'project/TypeCheck.hs', 'project/KeyValueStore.hs', 'project/Interpret.hs',  'project/Validate.hs', 'project/Compile.hs']
-        #submittedPaths = ['hw1/hw1.py']
-        #submittedPaths = ['hw3/hw3.py']
-        #submittedPaths = ['hw5/Allocation.hs']
-        #submittedPaths = ['hw3/parse.py', 'hw3/interpret.py', 'hw3/machine.py', 'hw3/compile.py']
-
         filesFound = []
         late = False
         lateTimes = []

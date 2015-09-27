@@ -8,14 +8,48 @@
 ##
 ##
 
-import os # walk, path, system
+import sys # For command line arguments.
+import os  # For commands and file manipulation (walk, path, system).
+
+#####################################################################
+## ASCII escape sequence macros for color output on the terminal.
+##
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+def printred(s): print(bcolors.FAIL + s + bcolors.ENDC)
+def printblue(s): print(bcolors.OKBLUE + s + bcolors.ENDC)
 
 #####################################################################
 ## Process the command line parameters.
 ##
 
-task = 'hw6'
-course = 'cs235/Spring-2015'
+if     len(sys.argv) == 5\
+   and int(sys.argv[1]) in range(100,1000)\
+   and sys.argv[2] in ['Fall', 'Spring']\
+   and int(sys.argv[3]) in range(2000,2100):
+    courseNumber = sys.argv[1]
+    season = sys.argv[2]
+    year = sys.argv[3]
+    path = sys.argv[4]
+    task = path
+    course = 'cs' + courseNumber + '/' + season + '-' + year
+else:
+    print('\n  Usage:\n\n    % python gradefiles-push.py <###> <Fall|Spring> <YYYY> <task>\n')
+    exit()
+
+#####################################################################
+## Check for list of files.
+##
+
+if not os.path.exists('./data'):
+    print('No folder "data" containing grade files found. Exiting.')
+    exit()
 
 #####################################################################
 ## Post the grade files.
@@ -32,7 +66,7 @@ for curdir, dirs, files in os.walk('./data/'):
             open(target, 'w').write(txt)
             print('Wrote file: ' + target)
         else:
-            print('Path '+path+' does not exist!')
+            printred('Path '+path+' does not exist!')
 
 #####################################################################
 ## Adjust grade file permissions so that students can read them.
@@ -40,4 +74,4 @@ for curdir, dirs, files in os.walk('./data/'):
 
 os.system('chmod 0664 /cs/course/' + course + '/homework/spool/*/grade.' + task + '.txt')
 
-#end
+#eof
