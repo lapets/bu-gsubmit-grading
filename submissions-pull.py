@@ -60,7 +60,8 @@ if not os.path.isfile(courseNumber + '.txt'):
 enrolled = sorted(open(courseNumber + '.txt').read().split("\n"))
 
 # Create and clear destination folder.
-rmtree('data')
+if os.path.exists('./data'):
+    rmtree('data')
 os.makedirs("data")
 
 # Retrieve submitted files.
