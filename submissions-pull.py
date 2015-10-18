@@ -19,14 +19,15 @@ from datetime import datetime # For making timestamps.
 ##
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
     ENDC = '\033[0m'
-def printred(s): print(bcolors.FAIL + s + bcolors.ENDC)
-def printblue(s): print(bcolors.OKBLUE + s + bcolors.ENDC)
+def printred(s): print(bcolors.RED + s + bcolors.ENDC)
+def printblue(s): print(bcolors.BLUE + s + bcolors.ENDC)
+def printpurple(s): print(bcolors.PURPLE + s + bcolors.ENDC)
 
 #####################################################################
 ## Process the command line parameters.
@@ -35,15 +36,25 @@ def printblue(s): print(bcolors.OKBLUE + s + bcolors.ENDC)
 if     len(sys.argv) == 5\
    and int(sys.argv[1]) in range(100,1000)\
    and sys.argv[2] in ['Fall', 'Spring']\
-   and int(sys.argv[3].split('-')[0]) in range(2000,2100):
+   and int(sys.argv[3].split('-')[0]) in range(2000,2100)\
+   and len(sys.argv[4]) > 0:
     courseNumber = sys.argv[1]
     season = sys.argv[2]
     year = sys.argv[3].split('-')[0]
     due = datetime.strptime(sys.argv[3] + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
     submittedPaths = sys.argv[4].split(' ')
+    extension = submittedPaths[0].split('.')[1]
 else:
     print('\n  Usage:\n\n    % python submissions-pull.py <###> <Fall|Spring> <YYYY-MM-DD> "path1 path2 ..."\n')
     exit()
+
+#####################################################################
+## Other useful functions.
+##
+
+def laterDate(date1, date2):
+    # Given two dates, return the later date.
+    pass
 
 #####################################################################
 ## Retrieve files.
@@ -66,22 +77,26 @@ os.makedirs("data")
 
 # Retrieve submitted files.
 for student in enrolled:
+
+    # Emit empty placeholder in case there is no submission.
+    open('data/'+student+'.'+extension, 'a').write("")
+
+    # Attempt to Retrieve student's submission.
     if not student in gsubmits:
         printred('No gsubmit subfolder for '+student+' found!')
     elif not os.path.isfile(os.path.join(path, student)):
         filesFound = []
         late = False
         lateTimes = []
-        found = False
         for submittedPath in submittedPaths:
             filePath = path+student+'/'+submittedPath
-            if os.path.exists(filePath):# and not found:
+            extension = extension
+            if os.path.exists(filePath):
                 (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filePath)
 
                 try:
                     txt = open(filePath, 'r').read()
-                    ext = filePath.split(".")[-1] # Use file extensions.
-                    open('data/'+student+'.'+ext, 'a').write("\n# " + submittedPath + "\n\n"+txt+"\n\n\n")
+                    open('data/'+student+'.'+extension, 'a').write("\n# " + submittedPath + "\n\n"+txt+"\n\n\n")
                 except:
                     pass
 
@@ -93,16 +108,17 @@ for student in enrolled:
                 else:
                     pass
                     #print(str(time.ctime(mtime)) + ': wrote file for ' + student + ".")
-                found = True
                 filesFound = filesFound + [submittedPath]
-        if len(filesFound) != len(submittedPaths):
+        if len(filesFound) > 0 and len(filesFound) != len(submittedPaths):
+	    if late:
+	        printblue('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + " (" + ", ".join(lateTimes) + ").")
+	    else:
+	        printpurple('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '! ***')
+        elif len(filesFound) == 0:
             printred('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '! ***')
         elif len(filesFound) == len(submittedPaths) and late:
             printblue(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + " (" + ", ".join(lateTimes) + ").")
         elif len(filesFound) == len(submittedPaths):
             print(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + ".")
-
-        #if not found:
-        #    printred('No submission from '+student+' found!')
 
 #eof
