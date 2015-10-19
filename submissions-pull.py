@@ -8,11 +8,11 @@
 ##
 ##
 
-import sys                    # For command line arguments.
-import os                     # For file and folder manipulation.
-import time                   # For displaying timestamps.
-from shutil import rmtree     # For deleting a folder.
-from datetime import datetime # For making timestamps.
+import sys                               # Command line arguments.
+import os                                # File/folder manipulation.
+import time                              # Displaying timestamps.
+from shutil import rmtree                # Deleting a folder.
+from datetime import datetime, timedelta # Making timestamps.
 
 #####################################################################
 ## ASCII escape sequence macros for color output on the terminal.
@@ -42,20 +42,13 @@ if     len(sys.argv) == 5\
     courseNumber = sys.argv[1]
     season = sys.argv[2]
     year = sys.argv[3].split('-')[0]
-    due = datetime.strptime(sys.argv[3] + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+    dueTime = datetime.strptime(sys.argv[3] + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
     submittedPaths = sys.argv[4].split(' ')
     extension = submittedPaths[0].split('.')[1]
+    grace = 0 # Grace period in hours, if applicable.
 else:
     print('\n  Usage:\n\n    % python submissions-pull.py <###> <Fall|Spring> <YYYY-MM-DD> "path1 path2 ..."\n')
     exit()
-
-#####################################################################
-## Other useful functions.
-##
-
-def laterDate(date1, date2):
-    # Given two dates, return the later date.
-    pass
 
 #####################################################################
 ## Retrieve files.
@@ -82,44 +75,55 @@ for student in enrolled:
     # Emit empty placeholder in case there is no submission.
     open('data/'+student+'.'+extension, 'a').write("")
 
-    # Attempt to Retrieve student's submission.
+    # Attempt to retrieve student's submission.
     if not student in gsubmits:
-        printred('No gsubmit subfolder for '+student+' found!')
+        printred(('*' * 19) + ': no gsubmit subfolder for '+student+' found!')
     elif not os.path.isfile(os.path.join(path, student)):
         filesFound = []
         late = False
         lateTimes = []
+        latestTime = None
+        latestTimeStr = None
+        
+        # Attempt to retrieve every file expected in the submission.
         for submittedPath in submittedPaths:
             filePath = path+student+'/'+submittedPath
             extension = extension
             if os.path.exists(filePath):
                 (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filePath)
 
+                # Attempt to retrieve the submission file.
                 try:
                     txt = open(filePath, 'r').read()
                     open('data/'+student+'.'+extension, 'a').write("\n# " + submittedPath + "\n\n"+txt+"\n\n\n")
                 except:
                     pass
 
-                submission = datetime.strptime(time.ctime(mtime), "%a %b %d %H:%M:%S %Y")
-                if due < submission:
+                # Calculate the times.
+                submissionTime = datetime.strptime(time.ctime(mtime), "%a %b %d %H:%M:%S %Y")
+                if (dueTime + timedelta(hours=grace)) < submissionTime:
                     late = True
                     lateTimes.append(str(time.ctime(mtime)))
-                else:
-                    pass
+                if latestTime is None or submissionTime > latestTime:
+                    latestTime = submissionTime
+                    latestTimeStr = str(time.ctime(mtime))[0:-5]
+                    
                 filesFound = filesFound + [submittedPath]
-        if len(filesFound) > 0 and len(filesFound) != len(submittedPaths):
+
+        # Report the results for this student.
+        if len(filesFound) == 0:
+            printred(('*' * 19) + ': missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '!')
+        elif len(filesFound) > 0 and len(filesFound) != len(submittedPaths):
 	        if late:
-	            printblue('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + " (" + ", ".join(lateTimes) + ").")
+	            printblue(latestTimeStr + ': missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + ".")
 	        else:
-	            printpurple('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '!')
-        elif len(filesFound) == 0:
-            printred('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '!')
-        elif len(filesFound) == len(submittedPaths) and late:
-            printblue(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + " (" + ", ".join(lateTimes) + ").")
+	            printpurple(latestTimeStr + ': missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '.')
         elif len(filesFound) == len(submittedPaths):
-            print(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + ".")
+            if late:
+                printblue(latestTimeStr + ': wrote files ' + str(filesFound) + ' for ' + student + ".")
+            else:
+                print(latestTimeStr + ': wrote files ' + str(filesFound) + ' for ' + student + ".")
         else:
-            printyellow('Could not determine submission status for ' + student + '!')
+            printyellow(('*' * 19) + ': could not determine submission status for ' + student + '!')
 
 #eof
