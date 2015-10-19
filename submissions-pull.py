@@ -27,6 +27,7 @@ class bcolors:
     ENDC = '\033[0m'
 def printred(s): print(bcolors.RED + s + bcolors.ENDC)
 def printblue(s): print(bcolors.BLUE + s + bcolors.ENDC)
+def printyellow(s): print(bcolors.YELLOW + s + bcolors.ENDC)
 def printpurple(s): print(bcolors.PURPLE + s + bcolors.ENDC)
 
 #####################################################################
@@ -104,21 +105,21 @@ for student in enrolled:
                 if due < submission:
                     late = True
                     lateTimes.append(str(time.ctime(mtime)))
-                    #printblue(str(time.ctime(mtime)) + ': wrote file for ' + student + ".")
                 else:
                     pass
-                    #print(str(time.ctime(mtime)) + ': wrote file for ' + student + ".")
                 filesFound = filesFound + [submittedPath]
         if len(filesFound) > 0 and len(filesFound) != len(submittedPaths):
-	    if late:
-	        printblue('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + " (" + ", ".join(lateTimes) + ").")
-	    else:
-	        printpurple('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '! ***')
+	        if late:
+	            printblue('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + " (" + ", ".join(lateTimes) + ").")
+	        else:
+	            printpurple('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '!')
         elif len(filesFound) == 0:
-            printred('*** Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '! ***')
+            printred('Missing files ' + str(set(submittedPaths) - set(filesFound)) + ' from ' + student + '!')
         elif len(filesFound) == len(submittedPaths) and late:
             printblue(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + " (" + ", ".join(lateTimes) + ").")
         elif len(filesFound) == len(submittedPaths):
             print(str(time.ctime(mtime)) + ': wrote files ' + str(filesFound) + ' for ' + student + ".")
+        else:
+            printyellow('Could not determine submission status for ' + student + '!')
 
 #eof
