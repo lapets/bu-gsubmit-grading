@@ -16,14 +16,16 @@ import os  # For commands and file manipulation (walk, path, system).
 ##
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
     ENDC = '\033[0m'
-def printred(s): print(bcolors.FAIL + s + bcolors.ENDC)
-def printblue(s): print(bcolors.OKBLUE + s + bcolors.ENDC)
+def printred(s): print(bcolors.RED + s + bcolors.ENDC)
+def printblue(s): print(bcolors.BLUE + s + bcolors.ENDC)
+def printyellow(s): print(bcolors.YELLOW + s + bcolors.ENDC)
+def printpurple(s): print(bcolors.PURPLE + s + bcolors.ENDC)
 
 #####################################################################
 ## Process the command line parameters.
