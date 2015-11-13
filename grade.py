@@ -71,13 +71,16 @@ def check(part, maxPoints, functionName, inputs_result_pairs, isVar = False):
         passed = 0
         for (inputs, result) in inputs_result_pairs:
 
+            output = None
             try:
                 output = function(*inputs)
             except:
-                output = None
+                output = '<Error>'
 
             if output == result:
                 passed = passed + 1
+            elif output == '<Error>':
+                print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
             else:
                 pass
                 print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  Returned:\n    "+str(output)+"\n")
