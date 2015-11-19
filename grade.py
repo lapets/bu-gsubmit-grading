@@ -6,10 +6,10 @@
 ##
 ##
 
-import sys  # Command line arguments.
-import os   # Commands and file manipulation (walk, path, system).
-import time # To sleep (to delay until script is finished).
-import re
+import sys                # Command line arguments.
+import os                 # File/folder manipulation.
+import time               # To sleep.
+from shutil import rmtree # Deleting a folder.
 
 #####################################################################
 ## Determine whether we are testing an entire folder or an individual
@@ -23,8 +23,10 @@ if len(sys.argv) == 1 or\
   # Default directory containing submissions is "./submitted".
   submitted = sys.argv[1] if len(sys.argv) == 2 else 'submitted'
 
-  # Should create target directory if it does not exist.
-  pass
+  # Create and clear target directory.
+  if os.path.exists('./' + submitted):
+      rmtree(submitted)
+  os.makedirs(submitted)
 
   # Walk the specified directory containing the submitted files.
   for curdir, dirs, files in os.walk(submitted):
