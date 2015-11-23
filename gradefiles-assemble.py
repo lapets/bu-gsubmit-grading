@@ -2,7 +2,7 @@
 ## 
 ## gradefiles-assemble.py
 ##
-##   Script template for assembling a collection of gradefiles from
+##   Script template for assembling a collection of grade files from
 ##   a collection of graded submissions (processed using the grading
 ##   script).
 ##
@@ -12,7 +12,7 @@ import os                 # File/folder work (walk, path, system).
 from shutil import rmtree # Deleting a folder.
 
 #####################################################################
-## Script to extract grade information from a compelted grade sheet.
+## Script to extract grade information from a completed grade file.
 ##
 
 def summary(txt):
@@ -31,9 +31,20 @@ def summary(txt):
 
     return "\t".join(summary)
 
+def total(txt):
+    # Add the total score to the grade file raw text by computing
+    # the sum of the component scores.
+    lines = txt.split("\n")
+    total = 0
+    for line in lines:
+        if line.find("/") != -1:
+            total += int(line.split("/")[0][-2:])
+    return txt + "Total:                         " + str(total).rjust(3) + "/100\n"
+
 #####################################################################
 ## Convert every file into a gradefile ready for the gradefiles-push
-## script; simultaneously display the columns for the grade sheet.
+## script; simultaneously display the column values for the grades
+## spreadsheet.
 ##
 
 # Check if source directory exists.
@@ -49,7 +60,7 @@ if os.path.exists('./processed'):
         for file in files:
             txt = open('./processed/'+file, 'r').read().replace('"""', "'''").split("'''")
             if len(txt) >= 2:
-                txt = txt[1]
+                txt = txt[1] # Or "addTotal(txt[1])".
                 name = file.split('.')[0]
                 target = './grades/'+name+'.py'
                 open(target, 'w').write(txt[1:])
