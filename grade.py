@@ -21,23 +21,26 @@ if len(sys.argv) == 1 or\
    len(sys.argv[1].split('.')) == 1: # No extension delimiter.
 
   # Default directory containing submissions is "./submitted".
-  submitted = sys.argv[1] if len(sys.argv) == 2 else 'submitted'
+  submitted = sys.argv[1] if len(sys.argv) == 2 else 'submitted'   
+
+  # Default target directory is "./processed".
+  processed = sys.argv[1] if len(sys.argv) == 2 else 'processed'
 
   # Create and clear target directory.
-  if os.path.exists('./' + submitted):
-      rmtree(submitted)
-  os.makedirs(submitted)
+  if os.path.exists('./' + processed):
+      rmtree(processed)
+  os.makedirs(processed)
 
   # Walk the specified directory containing the submitted files.
   for curdir, dirs, files in os.walk(submitted):
       for file in sorted(files): # Process in alphabetical order.
           status = 'Processing ' + file + '...'
           name = file.split('.')[0]
-          os.system('python grade.py ' + submitted + '/' + file + ' > processed/' + name + '.py')
+          os.system('python grade.py ' + submitted + '/' + file + ' > ' + processed + '/' + name + '.py')
           time.sleep(1) # In case above is asynchronous.
-          gradesheet = '"""\n' + "\n".join([line[1:] for line in open('processed/'+name+'.py').read().split('\n') if len(line) > 0 and line[0] == '@']) + '\n"""\n\n'
+          gradesheet = '"""\n' + "\n".join([line[1:] for line in open(processed + '/'+name+'.py').read().split('\n') if len(line) > 0 and line[0] == '@']) + '\n"""\n\n'
           contents = open(submitted + '/'+name+'.py').read()
-          open('processed/' + name + '.py', 'w').write(gradesheet + contents)
+          open(processed + '/' + name + '.py', 'w').write(gradesheet + contents)
 
           print(status + 'done.')
 
