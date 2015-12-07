@@ -29,6 +29,7 @@ if len(sys.argv) == 1 or\
   # Create and clear target directory.
   if os.path.exists('./' + processed):
       rmtree(processed)
+      time.sleep(1) # Wait for OS to process the above instruction.
   os.makedirs(processed)
 
   # Walk the specified directory containing the submitted files.
