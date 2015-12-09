@@ -48,11 +48,19 @@ if len(sys.argv) == 1 or\
   # Done processing file.
   exit()
 
+# If there is only one file in the directory other than
+# the script and there is no command line argument,
+# process only that file.
+name = None
+for curdir, dirs, files in os.walk('./data/'):
+    if len(files) == 2:
+        name = [for f in files if f != 'grade.py'][0]
+
 #####################################################################
 ## We are testing an individual file. Load the file.
 ##
 
-name = sys.argv[1].split('.')[0]
+name = sys.argv[1].split('.')[0] if name == None else name
 exec(open(name+'.py').read())
 
 total = 0
