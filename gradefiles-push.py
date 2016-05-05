@@ -2,7 +2,7 @@
 ## 
 ## gradefiles-push.py
 ##
-##   Script to post grade files to the  gsubmit directories of
+##   Script to post grade files to the gsubmit directories of
 ##   enrolled students; the input grade file names should correspond
 ##   to the user names of the students.
 ##
